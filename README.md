@@ -7,12 +7,19 @@ credits to Aaron Herndon / https://twitter.com/ac3lives
 
 ### usage:
 `git clone https://github.com/r0lh/kygocera.git`
+
 `cd kygocera && go build kygocera.go`
+
 `/kygocera <IP / URL / IP-Range>`
+
 e.g.
+
 `./kygocera 192.168.0.0/24`
+
 `./kygocera printer.mynetwork.local`
+
 `./kygocera 127.0.0.1 -p 9091 -t 200`
 
 or just 
+
 `go run kygocerta 192.168.0.0/24`
