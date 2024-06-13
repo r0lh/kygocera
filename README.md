@@ -7,7 +7,9 @@ credits to Aaron Herndon / https://twitter.com/ac3lives
 
 ### install
 `git clone https://github.com/r0lh/kygocera.git
+
 cd kygocera && go build kygocera.go
+
 /kygocera <IP / URL / IP-Range>`
 
 or
