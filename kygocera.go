@@ -166,7 +166,6 @@ func main() {
 	}
 
 	banner()
-	fmt.Println("port: ", *portPtr)
 	for _, host := range hosts {
 		target := host + ":" + *portPtr
 		fmt.Printf("[*] trying %s...", target)
