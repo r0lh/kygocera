@@ -12,7 +12,7 @@ greets to https://github.com/D4RKMATT3R
 ```
 git clone https://github.com/r0lh/kygocera.git
 cd kygocera && go build kygocera.go
-./kygocera -u <IP / URL / IP-Range>
+./kygocera -t <IP / URL / IP-Range>
 ```
 
 or
@@ -34,16 +34,16 @@ kygocera -u printer.mynetwork.local
 set timeout (in milliseconds) and port
 
 ```
-./kygocera 127.0.0.1 -p 9091 -t 200
+./kygocera -u 127.0.0.1 -p 9091 -t 200
 ```
 
 disable ssl 
 ```
-./kygocera 192.168.0.0/24 -n
+./kygocera -u 192.168.0.0/24 -n
 ```
 
 or just 
 
 ```
-go run kygocera 192.168.0.0/24
+go run kygocera -u 192.168.0.0/24
 ```
