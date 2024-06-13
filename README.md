@@ -6,14 +6,11 @@ credits to Aaron Herndon / https://twitter.com/ac3lives
 # CVE-2022-1026
 
 ### usage:
-`git clone https://github.com/r0lh/kygocera.git`
-
-`cd kygocera && go build kygocera.go`
-
-`/kygocera <IP / URL / IP-Range>`
+`git clone https://github.com/r0lh/kygocera.git
+cd kygocera && go build kygocera.go
+/kygocera <IP / URL / IP-Range>`
 
 e.g.
-
 `./kygocera 192.168.0.0/24`
 
 `./kygocera printer.mynetwork.local`
