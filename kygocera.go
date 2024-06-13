@@ -5,10 +5,9 @@
 // go build kygocera.go
 // ./kygocera <IP / URL / IP-Range)
 // e.g.
-// ./kygocera -h
-// ./kygocera -u 192.168.0.0/24
-// ./kygocera -u printer.mynetwork.local
-// ./kygocera -u 127.0.0.1 -p 9090 -t 200 -n
+// ./kygocera 192.168.0.0/24
+// ./kygocera printer.mynetwork.local
+// ./kygocera 127.0.0.1 -p 9091 -t 200
 package main
 
 import (
@@ -209,7 +208,6 @@ func checkKyoceraHTTP(target string, nossl bool) (bool, error) {
 	}
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get(target)
-	defer resp.Body.Close()
 	if err != nil {
 		fmt.Println("\n[DEBUG] error : \n", err)
 		return false, err
