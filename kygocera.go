@@ -3,7 +3,7 @@
 // poc for CVE-2022-1026
 // usage:
 // go build kygocera.go
-// ./kygocera <IP / URL / IP-Range)
+// ./kygocera <IP / URL / IP-Range>
 // e.g.
 // ./kygocera 192.168.0.0/24
 // ./kygocera printer.mynetwork.local
