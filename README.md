@@ -3,6 +3,9 @@ Improved Golang Version of Rapid7 PoC for CVE-2022-1026 (https://www.rapid7.com/
 
 credits to Aaron Herndon / https://twitter.com/ac3lives
 
+greets to https://github.com/D4RKMATT3R
+
+
 # CVE-2022-1026
 
 ### install
