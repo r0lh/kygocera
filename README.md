@@ -23,16 +23,22 @@ kygocera -h
 ```
 
 ### usage
-`kygocera -h`
+```
+kygocera -h
 
-`./kygocera 192.168.0.0/24`
+kygocera 192.168.0.0/24
 
-`./kygocera printer.mynetwork.local`
+kygocera printer.mynetwork.local
+```
 
 set timeout (in milliseconds) and port
 
-`./kygocera 127.0.0.1 -p 9091 -t 200`
+```
+./kygocera 127.0.0.1 -p 9091 -t 200
+```
 
 or just 
 
-`go run kygocerta 192.168.0.0/24`
+```
+go run kygocerta 192.168.0.0/24
+```
