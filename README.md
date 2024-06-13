@@ -6,15 +6,18 @@ credits to Aaron Herndon / https://twitter.com/ac3lives
 # CVE-2022-1026
 
 ### install
-`git clone https://github.com/r0lh/kygocera.git
-
+```
+git clone https://github.com/r0lh/kygocera.git
 cd kygocera && go build kygocera.go
-
-/kygocera <IP / URL / IP-Range>`
+./kygocera <IP / URL / IP-Range>
+```
 
 or
 
-`go install github.com/r0lh/kygocera@latest`
+```
+go install github.com/r0lh/kygocera@latest
+kygocera -h
+```
 
 ### usage
 `kygocera -h`
