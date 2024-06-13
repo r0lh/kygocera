@@ -40,5 +40,5 @@ set timeout (in milliseconds) and port
 or just 
 
 ```
-go run kygocerta 192.168.0.0/24
+go run kygocera 192.168.0.0/24
 ```
