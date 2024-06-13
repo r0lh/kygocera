@@ -5,15 +5,23 @@ credits to Aaron Herndon / https://twitter.com/ac3lives
 
 # CVE-2022-1026
 
-### usage:
+### install
 `git clone https://github.com/r0lh/kygocera.git
 cd kygocera && go build kygocera.go
 /kygocera <IP / URL / IP-Range>`
 
-e.g.
+or
+
+`go install github.com/r0lh/kygocera@latest`
+
+### usage
+`kygocera -h`
+
 `./kygocera 192.168.0.0/24`
 
 `./kygocera printer.mynetwork.local`
+
+set timeout (in milliseconds) and port
 
 `./kygocera 127.0.0.1 -p 9091 -t 200`
 
